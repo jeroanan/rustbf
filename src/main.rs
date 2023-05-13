@@ -18,7 +18,7 @@ fn main() {
 
     let mut machine_state = machine_state::initialize_machine();
 
-    type ValueFunction = fn(&mut machine_state::MachineState) -> bool;
+    type ValueFunction = fn(&mut machine_state::MachineState);
 
     let mut char_map: HashMap<char, ValueFunction>= HashMap::new();
     char_map.insert(PTR_INC, inc_ptr);
@@ -42,38 +42,31 @@ fn main() {
     }
 }
 
-fn inc_ptr(state: &mut machine_state::MachineState) -> bool {
+fn inc_ptr(state: &mut machine_state::MachineState) {
     state.inc_mem_ptr();
-    return true;
 }
 
-fn dec_ptr(state: &mut machine_state::MachineState) -> bool {
+fn dec_ptr(state: &mut machine_state::MachineState) {
     state.dec_mem_ptr();
-    return true;
 } 
 
-fn inc_loc(state: &mut machine_state::MachineState) -> bool {
+fn inc_loc(state: &mut machine_state::MachineState) {
     state.inc_mem_loc_val();
-    return true;
 }
 
-fn dec_loc(state: &mut machine_state::MachineState) -> bool {
+fn dec_loc(state: &mut machine_state::MachineState) {
     state.dec_mem_loc_val();
-    return true;
 }
 
-fn loop_begin(state: &mut machine_state::MachineState) -> bool {
+fn loop_begin(state: &mut machine_state::MachineState) {
     state.loop_begin();
-    return false;
 }
 
-fn loop_end(state: &mut machine_state::MachineState) -> bool {
+fn loop_end(state: &mut machine_state::MachineState) {
     state.loop_end();
-    return true;
 }
 
-fn put_char(state: &mut machine_state::MachineState) -> bool {
+fn put_char(state: &mut machine_state::MachineState) {
     let c = state.get_char_to_display();
     print!("{}", c);
-    return true;
 }
