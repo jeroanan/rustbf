@@ -5,7 +5,6 @@ type BfMemMap = [usize; bf_config::MEMORY_SIZE];
 pub struct MachineState {
     memory: BfMemMap,
     mem_ptr: usize,
-    pub program: [char; bf_config::MEMORY_SIZE+1],
     program_ctr: usize,
     loops: [usize; bf_config::MEMORY_SIZE],
     loop_ptr: usize,
@@ -87,7 +86,6 @@ pub fn initialize_machine() -> MachineState {
     return MachineState {
         memory: [0; bf_config::MEMORY_SIZE],
         mem_ptr: 0,
-        program: ['\0'; bf_config::MEMORY_SIZE+1],
         program_ctr: 0,
         loops: [0; bf_config::MEMORY_SIZE],
         loop_ptr: 0,

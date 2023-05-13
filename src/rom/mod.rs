@@ -1,7 +1,6 @@
 use std::fs;
 
 use crate::bf_config;
-use crate::machine_state;
 
 pub struct Rom {
     program_code: [char; bf_config::MEMORY_SIZE+1],
@@ -9,7 +8,7 @@ pub struct Rom {
 
 impl Rom {
 
-    pub fn read_program_file(&mut self, state: &mut machine_state::MachineState) {
+    pub fn read_program_file(&mut self) {
 
         let contents = fs::read_to_string(bf_config::FILE_NAME)
             .expect("Could not read file");
@@ -24,20 +23,23 @@ impl Rom {
 
         for (i, c) in in_chars.enumerate() {
             if i < bf_config::MEMORY_SIZE {
-                state.program[i] = c;
+                self.program_code[i] = c;
             }
         }
-        state.program[bf_config::MEMORY_SIZE] = '\0';
-        self.program_code = state.program;
+        self.program_code[bf_config::MEMORY_SIZE] = '\0';
+    }
+
+    pub fn get_code_at(&mut self, c: usize) -> char {
+        return self.program_code[c];
     }
 }
 
-pub fn initialize_rom(state: &mut machine_state::MachineState) -> Rom {
+pub fn initialize_rom() -> Rom {
     let mut ret = Rom {
         program_code: ['\0'; bf_config::MEMORY_SIZE+1],
     };
 
-    ret.read_program_file(state);
+    ret.read_program_file();
 
     return ret;
 }

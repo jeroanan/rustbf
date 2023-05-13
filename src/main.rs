@@ -14,7 +14,7 @@ const PUT_CHAR: char = '.';
 
 fn main() {
 
-    let valid_instructions = [PTR_INC, PTR_DEC, LOC_INC, LOC_DEC, LOOP_BEG, LOOP_END, PUT_CHAR];
+    let _valid_instructions = [PTR_INC, PTR_DEC, LOC_INC, LOC_DEC, LOOP_BEG, LOOP_END, PUT_CHAR];
 
     let mut machine_state = machine_state::initialize_machine();
 
@@ -29,12 +29,12 @@ fn main() {
     char_map.insert(LOOP_END, loop_end);
     char_map.insert(PUT_CHAR, put_char);
 
-    let mut rom = rom::initialize_rom(&mut machine_state);
+    let mut rom = rom::initialize_rom();
 
-    rom.read_program_file(&mut machine_state);
+    rom.read_program_file();
 
-    while machine_state.program[machine_state.get_program_counter()] != '\0' {
-        let c = machine_state.program[machine_state.get_program_counter()];
+    while rom.get_code_at(machine_state.get_program_counter()) != '\0' {
+        let c = rom.get_code_at(machine_state.get_program_counter());
         if let Some(func) = char_map.get(&c) {
             func(&mut machine_state);
             if !machine_state.should_skip_next_pc_step() {
