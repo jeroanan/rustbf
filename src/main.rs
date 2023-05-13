@@ -3,24 +3,34 @@ use std::fs;
 
 type BfMemMap = [i32; 1000];
 
+struct MachineState {
+    memory: BfMemMap,
+    mem_ptr: usize,
+    program: String,
+    program_ctr: usize,
+    loops: BfMemMap,
+    loop_ptr: usize,
+}
 
 fn main() {
     let file_name = "test1.txt";
 
+    let mut machine_state = MachineState {
+        memory: [0; 1000],
+        mem_ptr: 0,
+        program: String::from(""),
+        program_ctr: 0,
+        loops: [0; 1000],
+        loop_ptr: 0,
+    };
 
-    let mut mem: BfMemMap = [0; 1000];
-    let mut mem_ptr: usize = 0;
-
-    let mut loops: BfMemMap = [0;1000];
-    let mut loop_ptr: usize = 0;
-
-    type ValueFunction = fn(&mut BfMemMap, &mut usize, &mut BfMemMap, &mut usize) -> ();
+    type ValueFunction = fn(&mut MachineState) -> ();
 
     let mut char_map: HashMap<char, ValueFunction>= HashMap::new();
     char_map.insert('>', inc_ptr);
     char_map.insert('<', dec_ptr);
-    char_map.insert('+', |m,mr,_l,_lr| m[*mr]+=1);
-    char_map.insert('-', |m,mr,_l,_lr| m[*mr]-=1);
+    char_map.insert('+', |state| state.memory[state.mem_ptr]+=1);
+    char_map.insert('-', |state| state.memory[state.mem_ptr]-=1);
     char_map.insert('[', loop_begin);
 
     let contents = fs::read_to_string(file_name)
@@ -31,34 +41,37 @@ fn main() {
         .collect::<Vec<&str>>()
         .join("");
 
+    machine_state.program = in_chars.clone();
+
     for c in in_chars.chars() {
         if let Some(func) = char_map.get(&c) {
-            func(&mut mem, &mut mem_ptr, &mut loops, &mut loop_ptr);
+            func(&mut machine_state);
         }
     }
 
-    println!("{mem_ptr}");
+    println!("{:?}", machine_state.mem_ptr)
+
 }
 
-fn inc_ptr(_m: &mut BfMemMap, mr: &mut usize, _l: &mut BfMemMap, _lp: &mut usize) {
-    if *mr < 999 {
-        *mr+=1;
+fn inc_ptr(state: &mut MachineState) {
+    if state.mem_ptr < 999 {
+        state.mem_ptr+=1;
     } else {
-        *mr = 0;
+        state.mem_ptr = 0;
     }
 }
 
-fn dec_ptr(_m: &mut BfMemMap, mr: &mut usize, _l: &mut BfMemMap, _lp: &mut usize) {
-    if *mr > 0 {
-        *mr-=1;
+fn dec_ptr(state: &mut MachineState) {
+    if state.mem_ptr > 0 {
+        state.mem_ptr-=1;
     } else {
-        *mr = 1000;
+        state.mem_ptr = 1000;
     }
 } 
 
-fn loop_begin(m: &mut BfMemMap, mr: &mut usize, l: &mut BfMemMap, lp: &mut usize) {
-    l[*lp] = m[*mr+1];
-    *lp+=1;
+fn loop_begin(state: &mut MachineState) {
+    state.loops[state.loop_ptr] = state.memory[state.mem_ptr+1];
+    state.loop_ptr+=1;
 }
 
 /* 
