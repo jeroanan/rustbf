@@ -1,9 +1,8 @@
 use crate::bf_config;
-
-type BfMemMap = [usize; bf_config::MEMORY_SIZE];
+use crate::memory;
 
 pub struct MachineState {
-    memory: BfMemMap,
+    memory: memory::Memory,
     mem_ptr: usize,
     program_ctr: usize,
     loops: [usize; bf_config::MEMORY_SIZE],
@@ -32,12 +31,12 @@ impl MachineState {
     }
 
     pub fn inc_mem_loc_val(&mut self) {
-        self.memory[self.mem_ptr]+=1;
+        self.memory.inc_memory_at_address(self.mem_ptr);
         self.skip_next_pc_step = false;
     }
 
     pub fn dec_mem_loc_val(&mut self) {
-        self.memory[self.mem_ptr]-=1;
+        self.memory.dec_memory_at_address(self.mem_ptr);
         self.skip_next_pc_step = false;
     }
 
@@ -49,7 +48,7 @@ impl MachineState {
     }
 
     pub fn loop_end(&mut self) {
-        if self.memory[self.mem_ptr] > 0 {
+        if self.memory.get_memory_at_address(self.mem_ptr) > 0 { //self.memory[self.mem_ptr] > 0 {
             self.program_ctr = self.loops[self.loop_ptr-1];
             self.skip_next_pc_step = true;
             return;
@@ -62,7 +61,7 @@ impl MachineState {
     pub fn get_char_to_display(&mut self) -> char {
         self.skip_next_pc_step = false;
 
-        if let Some(c) = char::from_u32(self.memory[self.mem_ptr] as u32) {
+        if let Some(c) = char::from_u32(self.memory.get_memory_at_address(self.mem_ptr) as u32) {
             return c;
         }
         return '\0';
@@ -82,9 +81,9 @@ impl MachineState {
 
 }
 
-pub fn initialize_machine() -> MachineState {
+pub fn initialize_machine(mem: memory::Memory) -> MachineState {
     return MachineState {
-        memory: [0; bf_config::MEMORY_SIZE],
+        memory: mem,
         mem_ptr: 0,
         program_ctr: 0,
         loops: [0; bf_config::MEMORY_SIZE],

@@ -3,11 +3,11 @@ use std::collections::HashMap;
 mod bf_config;
 mod bf_instructions;
 mod machine_state;
+mod memory;
 mod rom;
 
 fn main() {
 
-    let mut machine_state = machine_state::initialize_machine();
 
     type ValueFunction = fn(&mut machine_state::MachineState);
 
@@ -21,6 +21,8 @@ fn main() {
     char_map.insert(bf_instructions::PUT_CHAR, put_char);
 
     let mut rom = rom::initialize_rom();
+    let memory = memory::initialize_memory();
+    let mut machine_state = machine_state::initialize_machine(memory);
 
     rom.read_program_file();
 
