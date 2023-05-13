@@ -3,13 +3,13 @@ use crate::bf_config;
 type BfMemMap = [usize; bf_config::MEMORY_SIZE];
 
 pub struct MachineState {
-    pub memory: BfMemMap,
+    memory: BfMemMap,
     mem_ptr: usize,
     pub program: [char; bf_config::MEMORY_SIZE+1],
-    pub program_ctr: usize,
+    program_ctr: usize,
     loops: [usize; bf_config::MEMORY_SIZE],
     loop_ptr: usize,
-    pub skip_next_pc_step: bool,
+    skip_next_pc_step: bool,
 }
 
 impl MachineState {
@@ -71,6 +71,14 @@ impl MachineState {
 
     pub fn step_program_counter(&mut self) {
         self.program_ctr+=1;
+    }
+
+    pub fn get_program_counter(&mut self) -> usize {
+        return self.program_ctr;
+    }
+
+    pub fn should_skip_next_pc_step(&mut self) -> bool {
+        return self.skip_next_pc_step;
     }
 
 }

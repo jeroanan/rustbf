@@ -31,11 +31,11 @@ fn main() {
 
     read_program::read_program_file(&mut machine_state);
 
-    while machine_state.program[machine_state.program_ctr] != '\0' {
-        let c = machine_state.program[machine_state.program_ctr];
+    while machine_state.program[machine_state.get_program_counter()] != '\0' {
+        let c = machine_state.program[machine_state.get_program_counter()];
         if let Some(func) = char_map.get(&c) {
             func(&mut machine_state);
-            if !machine_state.skip_next_pc_step {
+            if !machine_state.should_skip_next_pc_step() {
                 machine_state.step_program_counter();
             }
         } 
