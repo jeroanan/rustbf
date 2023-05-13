@@ -2,6 +2,7 @@ use std::{collections::HashMap};
 
 mod machine_state;
 mod read_program;
+mod bf_config;
 
 const PTR_INC: char = '>';
 const PTR_DEC: char = '<';
