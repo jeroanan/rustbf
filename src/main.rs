@@ -1,33 +1,24 @@
 use std::collections::HashMap;
 
+mod bf_config;
+mod bf_instructions;
 mod machine_state;
 mod rom;
-mod bf_config;
-
-const PTR_INC: char = '>';
-const PTR_DEC: char = '<';
-const LOC_INC: char = '+';
-const LOC_DEC: char = '-';
-const LOOP_BEG: char = '[';
-const LOOP_END: char = ']';
-const PUT_CHAR: char = '.';
 
 fn main() {
-
-    let _valid_instructions = [PTR_INC, PTR_DEC, LOC_INC, LOC_DEC, LOOP_BEG, LOOP_END, PUT_CHAR];
 
     let mut machine_state = machine_state::initialize_machine();
 
     type ValueFunction = fn(&mut machine_state::MachineState);
 
     let mut char_map: HashMap<char, ValueFunction>= HashMap::new();
-    char_map.insert(PTR_INC, inc_ptr);
-    char_map.insert(PTR_DEC, dec_ptr);
-    char_map.insert(LOC_INC, inc_loc);
-    char_map.insert(LOC_DEC, dec_loc);
-    char_map.insert(LOOP_BEG, loop_begin);
-    char_map.insert(LOOP_END, loop_end);
-    char_map.insert(PUT_CHAR, put_char);
+    char_map.insert(bf_instructions::PTR_INC, inc_ptr);
+    char_map.insert(bf_instructions::PTR_DEC, dec_ptr);
+    char_map.insert(bf_instructions::LOC_INC, inc_loc);
+    char_map.insert(bf_instructions::LOC_DEC, dec_loc);
+    char_map.insert(bf_instructions::LOOP_BEG, loop_begin);
+    char_map.insert(bf_instructions::LOOP_END, loop_end);
+    char_map.insert(bf_instructions::PUT_CHAR, put_char);
 
     let mut rom = rom::initialize_rom();
 
