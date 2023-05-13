@@ -26,14 +26,22 @@ fn main() {
 
     type ValueFunction = fn(&mut MachineState) -> bool;
 
+    const PTR_INC: char = '>';
+    const PTR_DEC: char = '<';
+    const LOC_INC: char = '+';
+    const LOC_DEC: char = '-';
+    const LOOP_BEG: char = '[';
+    const LOOP_END: char = ']';
+    const PUT_CHAR: char = '.';
+
     let mut char_map: HashMap<char, ValueFunction>= HashMap::new();
-    char_map.insert('>', inc_ptr);
-    char_map.insert('<', dec_ptr);
-    char_map.insert('+', inc_loc);
-    char_map.insert('-', dec_loc);
-    char_map.insert('[', loop_begin);
-    char_map.insert(']', loop_end);
-    char_map.insert('.', put_char);
+    char_map.insert(PTR_INC, inc_ptr);
+    char_map.insert(PTR_DEC, dec_ptr);
+    char_map.insert(LOC_INC, inc_loc);
+    char_map.insert(LOC_DEC, dec_loc);
+    char_map.insert(LOOP_BEG, loop_begin);
+    char_map.insert(LOOP_END, loop_end);
+    char_map.insert(PUT_CHAR, put_char);
 
     let contents = fs::read_to_string(file_name)
         .expect("Could not read file");
