@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 mod machine_state;
 mod read_program;
@@ -16,14 +16,7 @@ fn main() {
 
     let valid_instructions = [PTR_INC, PTR_DEC, LOC_INC, LOC_DEC, LOOP_BEG, LOOP_END, PUT_CHAR];
 
-    let mut machine_state = machine_state::MachineState {
-        memory: [0; bf_config::MEMORY_SIZE],
-        mem_ptr: 0,
-        program: ['\0'; 1001],
-        program_ctr: 0,
-        loops: [0; bf_config::MEMORY_SIZE],
-        loop_ptr: 0,
-    };
+    let mut machine_state = machine_state::initialize_machine();
 
     type ValueFunction = fn(&mut machine_state::MachineState) -> bool;
 
@@ -41,7 +34,8 @@ fn main() {
     while machine_state.program[machine_state.program_ctr] != '\0' {
         let c = machine_state.program[machine_state.program_ctr];
         if let Some(func) = char_map.get(&c) {
-            if func(&mut machine_state) {
+            func(&mut machine_state);
+            if !machine_state.skip_next_pc_step {
                 machine_state.program_ctr+=1;
             }
         } 
@@ -49,57 +43,37 @@ fn main() {
 }
 
 fn inc_ptr(state: &mut machine_state::MachineState) -> bool {
-    if state.mem_ptr < bf_config::MEMORY_SIZE  {
-        state.mem_ptr+=1;
-    } else {
-        state.mem_ptr = 0;
-    }
-
+    state.inc_mem_ptr();
     return true;
 }
 
 fn dec_ptr(state: &mut machine_state::MachineState) -> bool {
-    if state.mem_ptr > 0 {
-        state.mem_ptr-=1;
-    } else {
-        state.mem_ptr = bf_config::MEMORY_SIZE;
-    }
-
+    state.dec_mem_ptr();
     return true;
 } 
 
 fn inc_loc(state: &mut machine_state::MachineState) -> bool {
-    state.memory[state.mem_ptr]+=1;
+    state.inc_mem_loc_val();
     return true;
 }
 
 fn dec_loc(state: &mut machine_state::MachineState) -> bool {
-    state.memory[state.mem_ptr]-=1;
+    state.dec_mem_loc_val();
     return true;
 }
 
 fn loop_begin(state: &mut machine_state::MachineState) -> bool {
-    state.program_ctr+=1;
-    state.loops[state.loop_ptr] = state.program_ctr;
-    state.loop_ptr+=1;
-
+    state.loop_begin();
     return false;
 }
 
 fn loop_end(state: &mut machine_state::MachineState) -> bool {
-    if state.memory[state.mem_ptr] > 0 {
-        state.program_ctr = state.loops[state.loop_ptr-1];
-        return false;
-    }
-    state.loop_ptr-=1;
-
+    state.loop_end();
     return true;
 }
 
 fn put_char(state: &mut machine_state::MachineState) -> bool {
-    if let Some(c) = char::from_u32(state.memory[state.mem_ptr] as u32) {
-        print!("{}", c);
-    }
-
+    let c = state.get_char_to_display();
+    print!("{}", c);
     return true;
 }
