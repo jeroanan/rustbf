@@ -1,6 +1,7 @@
 use std::fs;
 
 use crate::bf_config;
+use crate::bf_instructions;
 
 pub struct Rom {
     program_code: [char; bf_config::MEMORY_SIZE+1],
@@ -21,11 +22,17 @@ impl Rom {
 
         let in_chars = joined.chars();
 
-        for (i, c) in in_chars.enumerate() {
-            if i < bf_config::MEMORY_SIZE {
-                self.program_code[i] = c;
+        let mut ic = 0;
+
+        for (_i, c) in in_chars.enumerate() {
+            let is_valid = bf_instructions::VALID_INSTRUCTIONS.contains(&c);
+
+            if is_valid && ic < bf_config::MEMORY_SIZE {
+                self.program_code[ic] = c;
+                ic+=1;
             }
         }
+
         self.program_code[bf_config::MEMORY_SIZE] = '\0';
     }
 

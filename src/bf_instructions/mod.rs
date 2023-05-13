@@ -6,4 +6,4 @@ pub const LOOP_BEG: char = '[';
 pub const LOOP_END: char = ']';
 pub const PUT_CHAR: char = '.';
 
-//pub _valid_instructions = [PTR_INC, PTR_DEC, LOC_INC, LOC_DEC, LOOP_BEG, LOOP_END, PUT_CHAR];
+pub const VALID_INSTRUCTIONS: [char; 7] = [PTR_INC, PTR_DEC, LOC_INC, LOC_DEC, LOOP_BEG, LOOP_END, PUT_CHAR];
