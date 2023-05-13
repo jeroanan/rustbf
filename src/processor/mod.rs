@@ -4,7 +4,7 @@ use crate::display;
 use crate::memory;
 use crate::rom;
 
-pub struct MachineState {
+pub struct Processor {
     display: display::Display,
     memory: memory::Memory,
     rom: rom::Rom,
@@ -15,7 +15,7 @@ pub struct MachineState {
     skip_next_pc_step: bool,
 }
 
-impl MachineState {
+impl Processor {
 
     pub fn start(&mut self) {
 
@@ -114,8 +114,8 @@ impl MachineState {
 
 }
 
-pub fn initialize_machine(mem: memory::Memory, rom: rom::Rom, display: display::Display) -> MachineState {
-    return MachineState {
+pub fn initialize_machine(mem: memory::Memory, rom: rom::Rom, display: display::Display) -> Processor {
+    return Processor {
         display: display,
         memory: mem,
         rom: rom,
