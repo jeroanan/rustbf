@@ -36,7 +36,7 @@ fn main() {
         if let Some(func) = char_map.get(&c) {
             func(&mut machine_state);
             if !machine_state.skip_next_pc_step {
-                machine_state.program_ctr+=1;
+                machine_state.step_program_counter();
             }
         } 
     }

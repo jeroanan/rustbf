@@ -4,11 +4,11 @@ type BfMemMap = [usize; bf_config::MEMORY_SIZE];
 
 pub struct MachineState {
     pub memory: BfMemMap,
-    pub mem_ptr: usize,
-    pub program: [char; 1001],
+    mem_ptr: usize,
+    pub program: [char; bf_config::MEMORY_SIZE+1],
     pub program_ctr: usize,
-    pub loops: [usize; bf_config::MEMORY_SIZE],
-    pub loop_ptr: usize,
+    loops: [usize; bf_config::MEMORY_SIZE],
+    loop_ptr: usize,
     pub skip_next_pc_step: bool,
 }
 
@@ -69,13 +69,17 @@ impl MachineState {
         return '\0';
     }
 
+    pub fn step_program_counter(&mut self) {
+        self.program_ctr+=1;
+    }
+
 }
 
 pub fn initialize_machine() -> MachineState {
     return MachineState {
         memory: [0; bf_config::MEMORY_SIZE],
         mem_ptr: 0,
-        program: ['\0'; 1001],
+        program: ['\0'; bf_config::MEMORY_SIZE+1],
         program_ctr: 0,
         loops: [0; bf_config::MEMORY_SIZE],
         loop_ptr: 0,
