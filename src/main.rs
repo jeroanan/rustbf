@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 mod machine_state;
-mod read_program;
+mod rom;
 mod bf_config;
 
 const PTR_INC: char = '>';
@@ -29,7 +29,9 @@ fn main() {
     char_map.insert(LOOP_END, loop_end);
     char_map.insert(PUT_CHAR, put_char);
 
-    read_program::read_program_file(&mut machine_state);
+    let mut rom = rom::initialize_rom(&mut machine_state);
+
+    rom.read_program_file(&mut machine_state);
 
     while machine_state.program[machine_state.get_program_counter()] != '\0' {
         let c = machine_state.program[machine_state.get_program_counter()];
