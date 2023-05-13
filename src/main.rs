@@ -17,11 +17,11 @@ fn main() {
     let valid_instructions = [PTR_INC, PTR_DEC, LOC_INC, LOC_DEC, LOOP_BEG, LOOP_END, PUT_CHAR];
 
     let mut machine_state = machine_state::MachineState {
-        memory: [0; 1000],
+        memory: [0; bf_config::MEMORY_SIZE],
         mem_ptr: 0,
         program: ['\0'; 1001],
         program_ctr: 0,
-        loops: [0; 1000],
+        loops: [0; bf_config::MEMORY_SIZE],
         loop_ptr: 0,
     };
 
@@ -49,7 +49,7 @@ fn main() {
 }
 
 fn inc_ptr(state: &mut machine_state::MachineState) -> bool {
-    if state.mem_ptr < 999 {
+    if state.mem_ptr < bf_config::MEMORY_SIZE  {
         state.mem_ptr+=1;
     } else {
         state.mem_ptr = 0;
@@ -62,7 +62,7 @@ fn dec_ptr(state: &mut machine_state::MachineState) -> bool {
     if state.mem_ptr > 0 {
         state.mem_ptr-=1;
     } else {
-        state.mem_ptr = 1000;
+        state.mem_ptr = bf_config::MEMORY_SIZE;
     }
 
     return true;
