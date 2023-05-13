@@ -1,21 +1,21 @@
-use std::collections::HashMap;
-use std::fs;
+use std::{collections::HashMap};
 
-type BfMemMap = [usize; 1000];
+mod machine_state;
+mod read_program;
 
-struct MachineState {
-    memory: BfMemMap,
-    mem_ptr: usize,
-    program: [char; 1001],
-    program_ctr: usize,
-    loops: [usize; 1000],
-    loop_ptr: usize,
-}
+const PTR_INC: char = '>';
+const PTR_DEC: char = '<';
+const LOC_INC: char = '+';
+const LOC_DEC: char = '-';
+const LOOP_BEG: char = '[';
+const LOOP_END: char = ']';
+const PUT_CHAR: char = '.';
 
 fn main() {
-    let file_name = "test1.txt";
 
-    let mut machine_state = MachineState {
+    let valid_instructions = [PTR_INC, PTR_DEC, LOC_INC, LOC_DEC, LOOP_BEG, LOOP_END, PUT_CHAR];
+
+    let mut machine_state = machine_state::MachineState {
         memory: [0; 1000],
         mem_ptr: 0,
         program: ['\0'; 1001],
@@ -24,15 +24,7 @@ fn main() {
         loop_ptr: 0,
     };
 
-    type ValueFunction = fn(&mut MachineState) -> bool;
-
-    const PTR_INC: char = '>';
-    const PTR_DEC: char = '<';
-    const LOC_INC: char = '+';
-    const LOC_DEC: char = '-';
-    const LOOP_BEG: char = '[';
-    const LOOP_END: char = ']';
-    const PUT_CHAR: char = '.';
+    type ValueFunction = fn(&mut machine_state::MachineState) -> bool;
 
     let mut char_map: HashMap<char, ValueFunction>= HashMap::new();
     char_map.insert(PTR_INC, inc_ptr);
@@ -43,25 +35,7 @@ fn main() {
     char_map.insert(LOOP_END, loop_end);
     char_map.insert(PUT_CHAR, put_char);
 
-    let contents = fs::read_to_string(file_name)
-        .expect("Could not read file");
-
-    let in_str = contents
-        .split("\n")
-        .collect::<Vec<&str>>();
-
-    let joined =  in_str.join("");
-
-    let in_chars = joined.chars();
-
-    // copy first 1000 chars from in_chars to machine_state.program
-    for (i, c) in in_chars.enumerate() {
-        if i > 999 {
-            break;
-        }
-        machine_state.program[i] = c;
-    }
-    machine_state.program[1000] = '\0';
+    read_program::read_program_file(&mut machine_state);
 
     while machine_state.program[machine_state.program_ctr] != '\0' {
         let c = machine_state.program[machine_state.program_ctr];
@@ -73,7 +47,7 @@ fn main() {
     }
 }
 
-fn inc_ptr(state: &mut MachineState) -> bool {
+fn inc_ptr(state: &mut machine_state::MachineState) -> bool {
     if state.mem_ptr < 999 {
         state.mem_ptr+=1;
     } else {
@@ -83,7 +57,7 @@ fn inc_ptr(state: &mut MachineState) -> bool {
     return true;
 }
 
-fn dec_ptr(state: &mut MachineState) -> bool {
+fn dec_ptr(state: &mut machine_state::MachineState) -> bool {
     if state.mem_ptr > 0 {
         state.mem_ptr-=1;
     } else {
@@ -93,17 +67,17 @@ fn dec_ptr(state: &mut MachineState) -> bool {
     return true;
 } 
 
-fn inc_loc(state: &mut MachineState) -> bool {
+fn inc_loc(state: &mut machine_state::MachineState) -> bool {
     state.memory[state.mem_ptr]+=1;
     return true;
 }
 
-fn dec_loc(state: &mut MachineState) -> bool {
+fn dec_loc(state: &mut machine_state::MachineState) -> bool {
     state.memory[state.mem_ptr]-=1;
     return true;
 }
 
-fn loop_begin(state: &mut MachineState) -> bool {
+fn loop_begin(state: &mut machine_state::MachineState) -> bool {
     state.program_ctr+=1;
     state.loops[state.loop_ptr] = state.program_ctr;
     state.loop_ptr+=1;
@@ -111,7 +85,7 @@ fn loop_begin(state: &mut MachineState) -> bool {
     return false;
 }
 
-fn loop_end(state: &mut MachineState) -> bool {
+fn loop_end(state: &mut machine_state::MachineState) -> bool {
     if state.memory[state.mem_ptr] > 0 {
         state.program_ctr = state.loops[state.loop_ptr-1];
         return false;
@@ -121,7 +95,7 @@ fn loop_end(state: &mut MachineState) -> bool {
     return true;
 }
 
-fn put_char(state: &mut MachineState) -> bool {
+fn put_char(state: &mut machine_state::MachineState) -> bool {
     if let Some(c) = char::from_u32(state.memory[state.mem_ptr] as u32) {
         print!("{}", c);
     }
