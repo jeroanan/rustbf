@@ -1,6 +1,5 @@
 use core::panic;
 use std::fs;
-use std::thread::current;
 
 use crate::bf_config;
 use crate::bf_instructions;

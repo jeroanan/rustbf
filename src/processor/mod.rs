@@ -13,7 +13,6 @@ pub struct Processor {
     loops: [usize; bf_config::MEMORY_SIZE],
     loop_ptr: usize,
     skip_next_pc_step: bool,
-    null_loop: bool,
 }
 
 impl Processor {
@@ -75,7 +74,6 @@ impl Processor {
         if self.memory.get_memory_at_address(self.mem_ptr) == 0 {
             self.program_ctr = self.rom.get_loop_end_addr(self.program_ctr)+1;
             self.skip_next_pc_step = true;
-            self.null_loop = true;
             return;
         }
 
@@ -90,10 +88,6 @@ impl Processor {
             self.program_ctr = self.loops[self.loop_ptr-1];
             self.skip_next_pc_step = true;
             return;
-        }
-        
-        if self.null_loop {
-            self.loop_ptr += 1;
         }
 
         self.loop_ptr-=1;
@@ -137,6 +131,5 @@ pub fn initialize_machine(mem: memory::Memory, rom: rom::Rom, display: display::
         loops: [0; bf_config::MEMORY_SIZE],
         loop_ptr: 0,
         skip_next_pc_step: false,
-        null_loop: false,
     };
 }
