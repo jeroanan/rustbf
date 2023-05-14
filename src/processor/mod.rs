@@ -71,6 +71,12 @@ impl Processor {
     }
 
     pub fn loop_begin(&mut self) {
+        if self.memory.get_memory_at_address(self.mem_ptr) == 0 {
+            self.program_ctr = self.rom.get_loop_end_addr(self.program_ctr)+1;
+            self.skip_next_pc_step = true;
+            return;
+        }
+
         self.program_ctr+=1;
         self.loops[self.loop_ptr] = self.program_ctr;
         self.loop_ptr+=1;
@@ -78,11 +84,12 @@ impl Processor {
     }
 
     pub fn loop_end(&mut self) {
-        if self.memory.get_memory_at_address(self.mem_ptr) > 0 { //self.memory[self.mem_ptr] > 0 {
+        if self.memory.get_memory_at_address(self.mem_ptr) > 0 { 
             self.program_ctr = self.loops[self.loop_ptr-1];
             self.skip_next_pc_step = true;
             return;
         }
+
         self.loop_ptr-=1;
     
         self.skip_next_pc_step = false;
@@ -116,9 +123,9 @@ impl Processor {
 
 pub fn initialize_machine(mem: memory::Memory, rom: rom::Rom, display: display::Display) -> Processor {
     return Processor {
-        display: display,
+        display,
         memory: mem,
-        rom: rom,
+        rom,
         mem_ptr: 0,
         program_ctr: 0,
         loops: [0; bf_config::MEMORY_SIZE],
