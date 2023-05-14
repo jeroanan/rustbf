@@ -1,4 +1,6 @@
+use core::panic;
 use std::fs;
+use std::thread::current;
 
 use crate::bf_config;
 use crate::bf_instructions;
@@ -39,6 +41,35 @@ impl Rom {
     pub fn get_code_at(&mut self, c: usize) -> char {
         return self.program_code[c];
     }
+
+    pub fn get_loop_end_addr(&mut self, start_addr: usize) -> usize {
+        if self.get_code_at(start_addr) != bf_instructions::LOOP_BEG {
+            panic!("Invalid loop start address");
+        }
+
+        let mut loop_depth = 0;
+        let mut current_addr = start_addr + 1;
+
+        while current_addr < bf_config::MEMORY_SIZE {
+            let c = self.get_code_at(current_addr);
+
+            if c == bf_instructions::LOOP_BEG {
+                loop_depth+=1;
+            } else if c == bf_instructions::LOOP_END {
+                if loop_depth == 0 {
+                    return current_addr;
+                } else {
+                    loop_depth-=1;
+                }
+            }
+
+            current_addr+=1;
+        }
+
+        panic!("Unable to find matching end of loop!");
+
+    }
+
 }
 
 pub fn initialize_rom() -> Rom {
